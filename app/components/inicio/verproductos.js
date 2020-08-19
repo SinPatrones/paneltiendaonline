@@ -204,7 +204,7 @@ class VerProductos extends Component {
                                             <td>
                                                 <button className="btn btn-warning" name={ obj.iditem + "editar" } id={ obj.iditem + "editar" } onClick={this.editandoProducto} disabled={this.state.editando} hidden={this.state.editando}><span className="fa fa-pencil-square-o" id={ obj.iditem + "editar" }></span></button>
 
-                                                <button className="btn btn-success" name={ obj.iditem + "editar" } id={ obj.iditem + "editar" } onClick={this.editandoProducto} disabled={this.state.editando} hidden={!this.state.editando}><span className="fa fa-floppy-o" id={ obj.iditem + "editar" }></span></button>
+                                                <button className="btn btn-success" name={ obj.iditem + "editar" } id={ obj.iditem + "editar" } onClick={this.editandoProducto} disabled={this.state.editando} hidden={!this.state.editando && (this.state.ideditar.toString() !== obj.iditem.toString())}><span className="fa fa-floppy-o" id={ obj.iditem + "editar" }></span></button>
 
                                                 <button className="btn btn-danger" id="cancelar" name="cancelar" onClick={this.cancelarEditado} hidden={!this.state.editando}><span className="fa fa-ban" id="cancelar"></span></button>
                                             </td>

@@ -12,19 +12,19 @@ class Navbar extends Component {
                 <div className="collapse navbar-collapse" id="navbarNavDropdown">
                     <ul className="navbar-nav">
                         <li className="nav-item menutop">
-                            <a className="nav-link" href="#">Cambiar Ahora</a>
+                            <a className="nav-link" href="#">Ingresar Producto</a>
                         </li>
                         <li className="nav-item menutop">
-                            <a className="nav-link" href="#">Historial</a>
+                            <a className="nav-link" href="#">Ver Productos</a>
                         </li>
                         <li className="nav-item menutop">
-                            <a className="nav-link" href="#">Cuentas Bancarias</a>
+                            <a className="nav-link" href="#">Registrar Personal</a>
                         </li>
                         <li className="nav-item menutop">
-                            <a className="nav-link" href="#">Recomienda y Gana</a>
+                            <a className="nav-link" href="#">Ver Personal</a>
                         </li>
                         <li className="nav-item menutop">
-                            <a className="nav-link" href="#">Cambiar Perfil</a>
+                            <a className="nav-link" href="#">Ver Pedidos</a>
                         </li>
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
@@ -32,8 +32,6 @@ class Navbar extends Component {
                                 Configuración
                             </a>
                             <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a className="dropdown-item" href="#">Editar este Perfil</a>
-                                <a className="dropdown-item" href="#">Cambiar Contraseña</a>
                                 <a className="dropdown-item" href="#">Salir</a>
                             </div>
                         </li>

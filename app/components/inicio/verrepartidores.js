@@ -1,6 +1,79 @@
 import React, {Component} from 'react';
+import swal from 'sweetalert';
 
 class VerRepartidores extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            listapersonal: []
+        };
+
+        this.fetchListaPersonal = this.fetchListaPersonal.bind(this);
+        this.fetchCambiarEstado = this.fetchCambiarEstado.bind(this);
+    }
+
+    fetchListaPersonal() {
+        fetch(
+            '/api/administrador'
+        )
+            .then(res => res.json())
+            .then(lista => {
+                if (lista.status === 'ok') {
+                    this.setState({
+                        listapersonal: lista.data
+                    })
+                } else {
+                    swal("REGISTRADO", lista.msg, "error");
+                }
+            });
+    }
+
+    fetchCambiarEstado(idadministrador, estado){
+        swal( "Cambiando Estado", {
+            buttons: {
+                cancel: {
+                    text: "Cancelar",
+                    value: false,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Continuar",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        })
+            .then(rpta => {
+                if (rpta){
+                    fetch(
+                        '/api/administrador/estado',{
+                            method: 'put',
+                            body: JSON.stringify({
+                                idadministrador, estado
+                            }),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    )
+                        .then(res => res.json())
+                        .then(data => {
+                            swal("ESTADO ACTUALIZADO", "Se le actualizo el estado al usuario", "success");
+                            console.log("RPTA:", data);
+                        });
+                }
+            });
+    }
+
+    componentDidMount() {
+        this.fetchListaPersonal();
+    }
+
     render() {
         return (
             <div className="row justify-content-center">
@@ -9,50 +82,33 @@ class VerRepartidores extends Component {
                     <table className="table table-hover">
                         <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nombres</th>
-                            <th scope="col">Apellidos</th>
-                            <th scope="col">Correo</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">NOMBRES</th>
+                            <th scope="col">APELLIDOS</th>
+                            <th scope="col">CORREO</th>
+                            <th scope="col">TIPO</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>nombres</td>
-                            <td>apellidos</td>
-                            <td>@correo@correo.com</td>
-                            <td>
-                                <button className="btn btn-danger">DESHABILITAR</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>nombres</td>
-                            <td>apellidos</td>
-                            <td>@correo@correo.com</td>
-                            <td>
-                                <button className="btn btn-danger">DESHABILITAR</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>nombres</td>
-                            <td>apellidos</td>
-                            <td>@correo@correo.com</td>
-                            <td>
-                                <button className="btn btn-danger">DESHABILITAR</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>nombres</td>
-                            <td>apellidos</td>
-                            <td>@correo@correo.com</td>
-                            <td>
-                                <button className="btn btn-danger">DESHABILITAR</button>
-                            </td>
-                        </tr>
+                        {
+                            this.state.listapersonal.map((obj, idx) => {
+                                return (
+                                    <tr key={idx}>
+                                        <th scope="row">{obj.idadministrador}</th>
+                                        <td>{obj.nombres}</td>
+                                        <td>{obj.apellidos}</td>
+                                        <td>{obj.correo}</td>
+                                        <td>{obj.role? "Administrador":"Repartidor"}</td>
+                                        <td align="center">
+                                            {
+                                                obj.habilitado? <button className="btn btn-danger" onClick={this.fetchCambiarEstado.bind(this, obj.idadministrador,!obj.habilitado)}>DESHABILITAR</button>:<button className="btn btn-success" onClick={this.fetchCambiarEstado.bind(this, obj.idadministrador,!obj.habilitado)}>HABILITAR</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        }
 
                         </tbody>
                     </table>

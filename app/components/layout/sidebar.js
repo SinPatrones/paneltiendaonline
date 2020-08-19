@@ -11,18 +11,20 @@ class Sidebar extends Component {
                         </a>
                         <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="1:ingresarproducto">Ingresar Producto</a>
                         <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="2:verproducto">Ver Productos</a>
-                        <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="3:registrarrepartidor">Registrar Repartidor</a>
-                        <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="4:verrepartidores">Ver Repartidores</a>
+                        <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="3:registrarrepartidor">Registrar Personal</a>
+                        <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="4:verrepartidores">Ver Personal</a>
                         <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="5:verpedidos">Ver Pedidos</a>
                     </div>
-                    <hr/>
-                    <div className="list-group">
-                        <a href="#" className="list-group-item list-group-item-action active">
-                            Soporte
-                        </a>
-                        <a href="#" className="list-group-item list-group-item-action"><img
-                            src="/images/phone.png"/> 959 370 922</a>
-                        <a href="#" className="list-group-item list-group-item-action"><img src="/images/mail.png"/>contacto@dolarsol.com</a>
+                    <div style={{display: 'none'}}>
+                        <hr/>
+                        <div className="list-group">
+                            <a href="#" className="list-group-item list-group-item-action active">
+                                Soporte
+                            </a>
+                            <a href="#" className="list-group-item list-group-item-action"><img
+                                src="/images/phone.png"/> 959 370 922</a>
+                            <a href="#" className="list-group-item list-group-item-action"><img src="/images/mail.png"/>contacto@dolarsol.com</a>
+                        </div>
                     </div>
                 </div>
 
