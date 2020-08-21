@@ -14,7 +14,7 @@ class DetallePedido extends Component {
 
     fetchListaProductos(){
         fetch(
-            '/api/pedido/' + this.props.idpedido + "?token="+localStorage.getItem('tiendaauthcliente')
+            '/api/pedido/' + this.props.idpedido + "?token="+localStorage.getItem('tiendauth')
         )
             .then(res => res.json())
             .then(pedidoDatos => {

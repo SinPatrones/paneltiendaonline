@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import DetallePedido from "./detallepedido";
+import swal from 'sweetalert';
 
 class VerPedidos extends Component {
     constructor(props) {
@@ -19,6 +20,7 @@ class VerPedidos extends Component {
         this.verPedido = this.verPedido.bind(this);
         this.menuPrincipal = this.menuPrincipal.bind(this);
         this.seleccionarRepartidor = this.seleccionarRepartidor.bind(this);
+        this.cancelarRepartidor = this.cancelarRepartidor.bind(this);
     }
 
     fetchObtenerPedidos(){
@@ -54,7 +56,30 @@ class VerPedidos extends Component {
     }
 
     fetchAsignarRepartidor(evt){
-
+        let datos = {
+            idadministrador: this.state.idrepartidor,
+            idpedido: this.state.idpedido
+        };
+        fetch(
+            '/api/pedido/registrarrepartidor',{
+                method: 'post',
+                body: JSON.stringify(datos),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': localStorage.getItem('tiendauth')
+                }
+            }
+        )
+            .then(res => res.json())
+            .then(datos => {
+                if (datos.status === "ok"){
+                    this.fetchObtenerPedidos();
+                    swal("REGISTRO CORRECTO", "Repartidor asignado", "success").then(r => console.log("RPTA:", r));
+                }else{
+                    swal("ERROR AL REGISTRAR", "Error al registrar repartidor", "error").then(r => console.log("RPTA:", r));
+                }
+            });
     }
 
     verPedido(evt){
@@ -68,8 +93,20 @@ class VerPedidos extends Component {
         });
     }
 
+    cancelarRepartidor(evt){
+        const idpedido = evt.target.name.split(":")[0];
+        this.setState({
+            idpedido: null,
+            idrepartidor: 0
+        }, () => {
+            this.setState({
+                idpedido: idpedido
+            });
+        });
+    }
+
     seleccionarRepartidor(evt){
-        const idRepartidor = evt.target.name.split(":")[0];
+        const idRepartidor = parseInt(evt.target.name.split(":")[0]);
         this.setState({
             idrepartidor: idRepartidor
         });
@@ -116,11 +153,16 @@ class VerPedidos extends Component {
                                                 <td align="center" className={ obj.estadopedido === '3'? "bg-danger": obj.estadopedido === '2'? "bg-success": obj.estadopedido === '1'? "bg-warning":"bg-dark" }>{ obj.estadopedido === '3'? "ANULADO": obj.estadopedido === '2'? "ENTREGADO": obj.estadopedido === '1'? "EN ESPERA":"DESCONOCIDO" }</td>
                                                 <td>{
                                                     obj.idrepartidor?
-                                                        obj.nombres + " " + obj.apellidos:
+                                                        <div>
+                                                            {obj.nombres + " " + obj.apellidos}
+                                                            <br/>
+                                                            <button type="button" className="btn btn-warning btn-sm" data-toggle="modal" data-target="#listaRepartidores" name={obj.idpedido + ":asignar"} onClick={this.cancelarRepartidor}>
+                                                                Cambiar
+                                                            </button>
+                                                        </div>:
                                                         <div>
                                                             Sin Asignar <br/>
-                                                            <button type="button" className="btn btn-danger"
-                                                                    data-toggle="modal" data-target="#listaRepartidores">
+                                                            <button type="button" className="btn btn-danger btn-sm" data-toggle="modal" data-target="#listaRepartidores" name={obj.idpedido + ":asignar"} onClick={this.cancelarRepartidor}>
                                                                 Sin Asignar
                                                             </button>
                                                         </div>
@@ -174,8 +216,8 @@ class VerPedidos extends Component {
                                         </table>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                        <button type="button" class="btn btn-primary" onClick={this.fetchAsignarRepartidor}>Guardar</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" oncancel={this.cancelarRepartidor}>Cerrar</button>
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal" onClick={this.fetchAsignarRepartidor} disabled={this.state.idrepartidor === 0}>Guardar</button>
                                     </div>
                                 </div>
                             </div>
