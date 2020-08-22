@@ -7,6 +7,8 @@ import VerRepartidores from "./verrepartidores";
 import VerPedidos from "./verpedidos";
 import Cookie from 'js-cookie';
 
+import VerPedidosRepartidor from "../repartidor/verpedidosrepartidor";
+
 class Index extends Component {
     constructor(props) {
         super(props);
@@ -52,6 +54,11 @@ class Index extends Component {
 
                 {
                     this.state.opcionElegida === "5" && <VerPedidos/>
+                }
+
+                {
+                    // SECCIÓN PARA EL REPARTIDOR
+                    this.state.opcionElegida === "101" && <VerPedidosRepartidor/>
                 }
             </Layout>
         );
