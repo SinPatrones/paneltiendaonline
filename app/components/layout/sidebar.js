@@ -18,6 +18,7 @@ class Sidebar extends Component {
                             </a>
                             <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="1:ingresarproducto">Ingresar Producto</a>
                             <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="2:verproducto">Ver Productos</a>
+                            <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="6:categorias">Categorías</a>
                             <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="3:registrarrepartidor">Registrar Personal</a>
                             <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="4:verrepartidores">Ver Personal</a>
                             <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="5:verpedidos">Ver Pedidos</a>

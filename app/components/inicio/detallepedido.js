@@ -45,8 +45,9 @@ class DetallePedido extends Component {
                     <strong>COMENTARIOS:</strong> { this.state.cabecera.comentarios? this.state.cabecera.comentarios: "Sin Comentarios" }
                 </div>
                 <div className="col-12 col-sm-10 col-md-8 mt-3">
-                    <table className="table table-hover">
-                        <thead>
+                    <div className="table-responsive">
+                        <table className="table table-hover">
+                            <thead>
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">DESCRIPCIÓN</th>
@@ -55,31 +56,32 @@ class DetallePedido extends Component {
                                 <th scope="col">PRECIO TOTAL</th>
                                 <th scope="col">ESTADO</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            this.state.descripcion.map((obj, idx) => {
-                                return (
-                                    <tr key={idx}>
-                                        <th scope="row">{ idx + 1 }</th>
-                                        <td>{ obj.nombreitem }</td>
-                                        <td>{ obj.cantidaditem }</td>
-                                        <td>{ parseFloat(obj.preciounitario).toFixed(2) }</td>
-                                        <td>{ parseFloat(obj.preciototal).toFixed(2) }</td>
-                                        {
-                                            !obj.entregado  && (this.state.cabecera.estadopedido === "3" || this.state.cabecera.estadopedido === "2")?
-                                                <td className="bg-danger">RECHAZADO</td>:
-                                                obj.entregado?
-                                                    <td className="bg-danger">ENTREGADO</td>
-                                                    :
-                                                    <td className="bg-warning">EN ESPERA</td>
-                                        }
-                                    </tr>
-                                );
-                            })
-                        }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {
+                                this.state.descripcion.map((obj, idx) => {
+                                    return (
+                                        <tr key={idx}>
+                                            <th scope="row">{ idx + 1 }</th>
+                                            <td>{ obj.nombreitem }</td>
+                                            <td>{ obj.cantidaditem }</td>
+                                            <td>{ parseFloat(obj.preciounitario).toFixed(2) }</td>
+                                            <td>{ parseFloat(obj.preciototal).toFixed(2) }</td>
+                                            {
+                                                !obj.entregado  && (this.state.cabecera.estadopedido === "3" || this.state.cabecera.estadopedido === "2")?
+                                                    <td className="bg-danger">RECHAZADO</td>:
+                                                    obj.entregado?
+                                                        <td className="bg-danger">ENTREGADO</td>
+                                                        :
+                                                        <td className="bg-warning">EN ESPERA</td>
+                                            }
+                                        </tr>
+                                    );
+                                })
+                            }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         );

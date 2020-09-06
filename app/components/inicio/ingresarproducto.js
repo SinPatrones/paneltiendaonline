@@ -14,6 +14,7 @@ class IngresarProducto extends Component {
             almacenadoen: '1',
             enoferta: false,
             descripcion: '',
+            imagenproducto: '',
 
             listaCategorias: [],
             listaCodigosUnidades: [],
@@ -27,23 +28,32 @@ class IngresarProducto extends Component {
 
     fetchCrearItem(evt){
         evt.preventDefault();
-        const body = {
-            nombreitem: this.state.nombreitem,
-            stockitem: this.state.stockitem,
-            precioitem: this.state.precioitem,
-            codigounidadmedida: this.state.codigounidadmedida,
-            categoria: this.state.categoria,
-            almacenadoen: this.state.almacenadoen,
-            enoferta: this.state.enoferta,
-            descripcionitem: this.state.descripcion
-        };
+        const file_data = document.querySelector('input[type="file"]');
+
+        let body = new FormData();
+
+        // SELECCIONADO IMAGEN DEL PRODUCTO PARA SUBIRLO
+        const imagenItem = document.getElementById('imagenproducto');
+        body.append('imagenItem', imagenItem.files[0]);
+
+        body.append("nombreitem", this.state.nombreitem);
+        body.append("stockitem", this.state.stockitem);
+        body.append("precioitem", this.state.precioitem);
+        body.append("codigounidadmedida", this.state.codigounidadmedida);
+        body.append("categoria", this.state.categoria);
+        body.append("almacenadoen", this.state.almacenadoen);
+        body.append("enoferta", this.state.enoferta);
+        body.append("descripcionitem", this.state.descripcion);
+
+        for(let [name, value] of body) {
+            console.log(`${name} = ${value}`); // key1=value1, then key2=value2
+        }
+
         console.log("BODY:", body);
         fetch('/api/items', {
             method: 'post',
-            body: JSON.stringify(body),
+            body: body,
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
                 'x-access-token': localStorage.getItem('tiendauth')
             }
         })
@@ -172,6 +182,13 @@ class IngresarProducto extends Component {
                                         })
                                     }
                                 </select>
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group col-12">
+                                <label htmlFor="imagenproducto">Imagen de Producto</label>
+                                <input type="file" className="form-control" id="imagenproducto" name="imagenproducto" value={this.state.imagenproducto} onChange={this.inputChangeComponent}/>
                             </div>
                         </div>
 

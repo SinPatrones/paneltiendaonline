@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
+import swal from 'sweetalert';
 
 class DetallePedidoRepartidor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            cabecera: {},
+            cabecera: {montototal: 0, montorechazado: 0, montopagado: 0},
             descripcion: [],
 
             precioaceptado: 0,
@@ -14,6 +15,8 @@ class DetallePedidoRepartidor extends Component {
             productosrechazados: [],
         };
 
+        this.fetchAnularPedido = this.fetchAnularPedido.bind(this);
+        this.fetchAceptarPedido = this.fetchAceptarPedido.bind(this);
         this.fetchListaProductos = this.fetchListaProductos.bind(this);
 
         this.sumarAceptado = this.sumarAceptado.bind(this);
@@ -36,6 +39,98 @@ class DetallePedidoRepartidor extends Component {
             });
     }
 
+    fetchAnularPedido(){
+        swal( "Anular Pedido", {
+            buttons: {
+                cancel: {
+                    text: "Cancelar",
+                    value: false,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Anular",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        })
+            .then(rpta => {
+                if (rpta){
+                    fetch(
+                        '/api/pedido/anular',{
+                            method: 'put',
+                            body: JSON.stringify({
+                                idpedido: this.state.cabecera.idpedido
+                            }),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'x-access-token': localStorage.getItem('tiendauth')
+                            }
+                        }
+                    )
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log("Anulado:", data);
+                        });
+                }
+            });
+    }
+
+    fetchAceptarPedido(){
+        swal( "Aceptar Pedido", {
+            buttons: {
+                cancel: {
+                    text: "Cancelar",
+                    value: false,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Aceptar",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        })
+            .then(rpta => {
+                if (rpta){
+                    fetch(
+                        '/api/pedido/aceptar',{
+                            method: 'put',
+                            body: JSON.stringify({
+                                idpedido: this.state.cabecera.idpedido,
+                                aceptados: this.state.productosaceptados,
+                                rechazados: this.state.productosrechazados,
+                                precioaceptado: this.state.precioaceptado,
+                                preciorechazado: this.state.preciorechazado
+                            }),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'x-access-token': localStorage.getItem('tiendauth')
+                            }
+                        }
+                    )
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.status === 'ok'){
+                                swal("REGISTRADO", "Se actualizo pedido, entregado", "success").then(r => console.log("RPTA:", r));
+                            }else{
+                                swal("ERROR", "No se pudo actualizar pedido, vuelva a intentarlo por favor", "error").then(r => console.log("RPTA:", r));
+                            }
+                        });
+                }
+            });
+    }
+
     aceptarTodo(){
         let sumatotal = 0;
         let productoaceptados = [];
@@ -45,7 +140,9 @@ class DetallePedidoRepartidor extends Component {
         }
         this.setState({
             precioaceptado: sumatotal.toFixed(2),
-            productosaceptados: productoaceptados
+            productosaceptados: productoaceptados,
+            productosrechazados: [],
+            preciorechazado: 0
         });
     }
 
@@ -60,6 +157,7 @@ class DetallePedidoRepartidor extends Component {
         if (this.state.productosrechazados.indexOf(id) >= 0){ // SI YA ESTA EN PRODUCTOS RECHAZADOS
             let totalrechazado = parseFloat(this.state.preciorechazado);
             totalrechazado -= precio;
+            totalrechazado = totalrechazado.toFixed(2);
             const productosRechazados = this.state.productosrechazados;
             let nuevoProductosRechazados = [];
             for (let i = 0; i < productosRechazados.length; i++){ // ELIMINAMOS EL ID DE LA LISTA DE RECHAZADOS
@@ -94,17 +192,17 @@ class DetallePedidoRepartidor extends Component {
         precio = parseFloat(precio);
 
 
-        if (this.state.productosaceptados.indexOf(id) >= 0){
+        if (this.state.productosaceptados.indexOf(id) >= 0){ // SI EL ITEM YA ESTA EN LA LISTA DE ELEMENTOS ACEPTADOS
             let totalaceptado = parseFloat(this.state.precioaceptado);
             totalaceptado -= precio;
+            totalaceptado = totalaceptado.toFixed(2);
             const productosAceptados = this.state.productosaceptados;
             let nuevoProductosAceptados = [];
-            for (let i = 0; i < productosAceptados; i++){
+            for (let i = 0; i < productosAceptados.length; i++){
                 if (productosAceptados[i] !== id){
                     nuevoProductosAceptados.push(productosAceptados[i]);
                 }
             }
-
             productosrechazados.push(id);
 
             this.setState({
@@ -135,6 +233,13 @@ class DetallePedidoRepartidor extends Component {
                         ATRAS
                     </button>
                     <div className="col-12 col-sm-10 col-md-8">
+                        <h3 className="text-center">CLIENTE</h3>
+                        <strong>NOMBRES: </strong> {this.state.cabecera.nombres} {this.state.cabecera.apellidos}
+                        <br/>
+                        <strong>DIRECCIÓN: </strong> {this.state.cabecera.direccion}
+                        <br/>
+                        <strong>TELEFONO: </strong> {this.state.cabecera.telefono}
+                        <br/>
                         <h3 className="text-center">DATOS</h3>
                         <strong>MONTO TOTAL:</strong> S/ { parseFloat(this.state.cabecera.montototal).toFixed(2)}
                         <br/>
@@ -153,10 +258,13 @@ class DetallePedidoRepartidor extends Component {
                                     <th scope="col">PRECIO UNITARIO</th>
                                     <th scope="col">PRECIO TOTAL</th>
                                     <th scope="col">ESTADO</th>
-                                    <th scope="col">
-                                        MARCAR
-                                        <button className="btn btn-success btn-sm ml-2" onClick={this.aceptarTodo}>MARCAR TODO</button>
-                                    </th>
+                                    {
+                                        this.state.cabecera.estadopedido === '1' &&
+                                        <th scope="col">
+                                            MARCAR
+                                            <button className="btn btn-success btn-sm ml-2" onClick={this.aceptarTodo}>MARCAR TODO</button>
+                                        </th>
+                                    }
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -171,18 +279,21 @@ class DetallePedidoRepartidor extends Component {
                                                 <td>{ parseFloat(obj.preciototal).toFixed(2) }</td>
                                                 {
                                                     !obj.entregado  && (this.state.cabecera.estadopedido === "3" || this.state.cabecera.estadopedido === "2")?
-                                                        <td className="bg-danger">RECHAZADO</td>:
+                                                        <td style={{backgroundColor: "#ef5350"}}>RECHAZADO</td>:
                                                         obj.entregado?
-                                                            <td className="bg-danger">ENTREGADO</td>
+                                                            <td style={{backgroundColor: "#93e9be"}}>ENTREGADO</td>
                                                             :
-                                                            <td className="bg-warning">EN ESPERA</td>
+                                                            <td style={{backgroundColor: "#ace7ff"}}>EN ESPERA</td>
                                                 }
-                                                <td>
-                                                    <div className="row">
-                                                        <button className="btn btn-success mt-1 ml-1" name={obj.iditem + ":" + obj.preciototal} onClick={this.sumarAceptado} disabled={this.state.productosaceptados.indexOf(obj.iditem) >= 0} >ENTREGADO</button>
-                                                        <button className="btn btn-danger mt-1 ml-1" name={obj.iditem + ":" + obj.preciototal} onClick={this.sumarRechazado} disabled={this.state.productosrechazados.indexOf(obj.iditem) >= 0} >RECHAZADO</button>
-                                                    </div>
-                                                </td>
+                                                {
+                                                    this.state.cabecera.estadopedido === '1' &&
+                                                    <td>
+                                                        <div className="row">
+                                                            <button className="btn btn-success mt-1 ml-1" name={obj.iditem + ":" + obj.preciototal} onClick={this.sumarAceptado} disabled={this.state.productosaceptados.indexOf(obj.iditem) >= 0} >ENTREGADO</button>
+                                                            <button className="btn btn-danger mt-1 ml-1" name={obj.iditem + ":" + obj.preciototal} onClick={this.sumarRechazado} disabled={this.state.productosrechazados.indexOf(obj.iditem) >= 0} >RECHAZADO</button>
+                                                        </div>
+                                                    </td>
+                                                }
                                             </tr>
                                         );
                                     })
@@ -195,16 +306,38 @@ class DetallePedidoRepartidor extends Component {
 
                 <div className="row justify-content-center">
                     <div className="col-12 col-sm-8 col-md-6">
-                        <h3>PRECIO DESCONTADO: S/ {this.state.preciorechazado}</h3>
-                        <br/>
-                        <h3>PRECIO FINAL: S/ {this.state.precioaceptado}</h3>
+                        {
+                            this.state.cabecera.estadopedido === '1' &&
+                                <React.Fragment>
+                                    <h3>MONTO RECHAZADO: S/ {parseFloat(this.state.preciorechazado).toFixed(2)}</h3>
+                                    <br/>
+                                    <h3>MONTO A PAGAR: S/ {parseFloat(this.state.precioaceptado).toFixed(2)}</h3>
+                                </React.Fragment>
+                        }
+                        {
+                            this.state.cabecera.estadopedido !== '1' &&
+                            <React.Fragment>
+                                <h3>MONTO RECHAZADO FUE: S/ {parseFloat(this.state.cabecera.montorechazado).toFixed(2)}</h3>
+                                <br/>
+                                <h3>MONTO PAGADO FUE: S/ {parseFloat(this.state.cabecera.montopagado).toFixed(2)}</h3>
+                            </React.Fragment>
+                        }
+
                         <hr/>
-                        <button className="btn btn-success text-center float-left">
-                            CONFIRMAR ENTREGA
-                        </button>
-                        <button className="btn-danger btn btn-sm text-center float-right">
-                            ANULAR ENTREGA
-                        </button>
+                        {
+                            this.state.cabecera.estadopedido === '1' &&
+                            <button className="btn btn-success text-center float-left" disabled={(this.state.productosaceptados.length + this.state.productosrechazados.length) !== this.state.descripcion.length}
+                                    onClick={this.fetchAceptarPedido}
+                            >
+                                CONFIRMAR ENTREGA
+                            </button>
+                        }
+                        {
+                            this.state.cabecera.estadopedido === '1' &&
+                            <button className="btn-danger btn btn-sm text-center float-right" onClick={this.fetchAnularPedido}>
+                                ANULAR ENTREGA
+                            </button>
+                        }
                     </div>
                 </div>
             </React.Fragment>

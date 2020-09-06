@@ -70,7 +70,7 @@ class VerProductos extends Component {
     buscandoProducto(evt){
         this.setState({
             buscarproducto: evt.target.value
-        }, async () => {
+        }, () => {
             fetch(
                 '/api/items/buscar?nombre=' + this.state.buscarproducto,{
                     method: 'get',
@@ -146,74 +146,114 @@ class VerProductos extends Component {
                 </div>
                 <div className="row justify-content-center">
                     <div className="col-10 text-center">
-                        <table className="table table-hover">
-                            <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">ITEM</th>
-                                <th scope="col">DESCRIPCION</th>
-                                <th scope="col">STOCK</th>
-                                <th scope="col">PRECIO</th>
-                                <th scope="col">CATEGORIA</th>
-                                <th scope="col">ESTADO</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {
-                                this.state.listaproductos.map((obj, idx) => {
-                                    return (
-                                        <tr key={idx}>
-                                            <th scope="row">{ obj.iditem }</th>
-                                            <td>{
-                                                this.state.editando && this.state.ideditar.toString() === obj.iditem.toString()?
-                                                    <input type="text" className="form-control" name="nuevonombreitem" placeholder={obj.nombreitem} onChange={this.inputChangeComponent}/>:
+                        <div className="table-responsive">
+                            <table className="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">ITEM</th>
+                                    <th scope="col">DESCRIPCION</th>
+                                    <th scope="col">STOCK</th>
+                                    <th scope="col">PRECIO</th>
+                                    <th scope="col">CATEGORIA</th>
+                                    <th scope="col">ESTADO</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {
+                                    this.state.listaproductos.map((obj, idx) => {
+                                        return (
+                                            <tr key={idx}>
+                                                <th scope="row">{ obj.iditem }</th>
+                                                <td>{
                                                     obj.nombreitem
-                                            }</td>
-                                            <td>{
-                                                this.state.editando && this.state.ideditar.toString() === obj.iditem.toString()?
-                                                    <input type="text" className="form-control" name="nuevadescripcionitem" placeholder={obj.descripcionitem} onChange={this.inputChangeComponent}/>:
+                                                }</td>
+                                                <td>{
                                                     obj.descripcionitem
-                                            }</td>
-                                            <td>{
-                                                this.state.editando && this.state.ideditar.toString() === obj.iditem.toString()?
-                                                    <input type="number" className="form-control" name="nuevostockitem" placeholder={obj.stockitem} onChange={this.inputChangeComponent}/>:
+                                                }</td>
+                                                <td>{
                                                     obj.stockitem
-                                            }</td>
-                                            <td>{
-                                                this.state.editando && this.state.ideditar.toString() === obj.iditem.toString()?
-                                                    <input type="number" className="form-control" name="nuevoprecioitem" placeholder={obj.precioitem} onChange={this.inputChangeComponent}/>:
+                                                }</td>
+                                                <td>{
                                                     obj.precioitem
-                                            }</td>
-                                            <td width="180px">{
-                                                this.state.editando && this.state.ideditar.toString() === obj.iditem.toString()?
-                                                    <select id="nuevacategoria" name="nuevacategoria" className="form-control" value={obj.idcatalogo} onChange={this.inputChangeComponent}>
-                                                        {
-                                                            this.state.listaCategorias.map(ele => {
-                                                                return (
-                                                                    <option key={ele.idcatalogo} value={ele.idcatalogo}>{ele.valor}</option>
-                                                                )
-                                                            })
-                                                        }
-                                                    </select>:
+                                                }</td>
+                                                <td width="180px">{
                                                     obj.categoria
-                                            }</td>
-                                            <td>{
-                                                this.state.editando && this.state.ideditar.toString() === obj.iditem.toString()?
-                                                    <div><input type="checkbox" name="nuevoenoferta" id="nuevoenoferta" onChange={this.inputChangeComponent}/><label htmlFor="nuevoenoferta">En Oferta</label></div>:
+                                                }</td>
+                                                <td>{
                                                     obj.enoferta? "En Oferta":"Sin Oferta" }</td>
-                                            <td>
-                                                <button className="btn btn-warning" name={ obj.iditem + "editar" } id={ obj.iditem + "editar" } onClick={this.editandoProducto} disabled={this.state.editando} hidden={this.state.editando}><span className="fa fa-pencil-square-o" id={ obj.iditem + "editar" }></span></button>
+                                                <td>
+                                                    <button type="button"
+                                                            className="btn btn-success btn-sm"
+                                                            data-toggle="modal"
+                                                            data-target="#listaRepartidores"
+                                                            name={ obj.iditem + "editar" } id={ obj.iditem + "editar" }
+                                                            onClick={this.editandoProducto}
+                                                    >
+                                                        <span className="fa fa-pencil-square-o" id={ obj.iditem + "editar" }></span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                                                <button className="btn btn-success" name={ obj.iditem + "editar" } id={ obj.iditem + "editar" } onClick={this.editandoProducto} disabled={this.state.editando} hidden={!this.state.editando && (this.state.ideditar.toString() !== obj.iditem.toString())}><span className="fa fa-floppy-o" id={ obj.iditem + "editar" }></span></button>
-
-                                                <button className="btn btn-danger" id="cancelar" name="cancelar" onClick={this.cancelarEditado} hidden={!this.state.editando}><span className="fa fa-ban" id="cancelar"></span></button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            }
-                            </tbody>
-                        </table>
+                <div className="modal fade" id="listaRepartidores" data-backdrop="static"
+                     data-keyboard="false" tabIndex="-1" aria-labelledby="listaRepartidoresLabel"
+                     aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="listaRepartidoresLabel">EDITAR PRODUCTO</h5>
+                                <button type="button" className="close" data-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body text-center">
+                                <div className="form">
+                                    <div className="form-row">
+                                        NOMBRE:
+                                        <input type="text" className="form-control"/>
+                                    </div>
+                                    <div className="form-row">
+                                        DESCRIPCIÓN:
+                                        <input type="text" className="form-control"/>
+                                    </div>
+                                    <div className="form-row">
+                                        STOCK:
+                                        <input type="text" className="form-control"/>
+                                    </div>
+                                    <div className="form-row">
+                                        PRECIO:
+                                        <input type="text" className="form-control"/>
+                                    </div>
+                                    <div className="form-row">
+                                        CATEGORIA:
+                                        <select id="nuevacategoria" name="nuevacategoria" className="form-control" onChange={this.inputChangeComponent}>
+                                            {
+                                                this.state.listaCategorias.map(ele => {
+                                                    return (
+                                                        <option key={ele.idcatalogo} value={ele.idcatalogo}>{ele.valor}</option>
+                                                    )
+                                                })
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cerrar
+                                </button>
+                                <button type="button" className="btn btn-primary" data-dismiss="modal">Guardar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

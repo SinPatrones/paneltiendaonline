@@ -79,39 +79,41 @@ class VerRepartidores extends Component {
             <div className="row justify-content-center">
                 <h3 className="text-center">VER REPARTIDORES</h3>
                 <div className="col-12">
-                    <table className="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">NOMBRES</th>
-                            <th scope="col">APELLIDOS</th>
-                            <th scope="col">CORREO</th>
-                            <th scope="col">TIPO</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            this.state.listapersonal.map((obj, idx) => {
-                                return (
-                                    <tr key={idx}>
-                                        <th scope="row">{obj.idadministrador}</th>
-                                        <td>{obj.nombres}</td>
-                                        <td>{obj.apellidos}</td>
-                                        <td>{obj.correo}</td>
-                                        <td>{obj.role? "Administrador":"Repartidor"}</td>
-                                        <td align="center">
-                                            {
-                                                obj.habilitado? <button className="btn btn-danger" onClick={this.fetchCambiarEstado.bind(this, obj.idadministrador,!obj.habilitado)}>DESHABILITAR</button>:<button className="btn btn-success" onClick={this.fetchCambiarEstado.bind(this, obj.idadministrador,!obj.habilitado)}>HABILITAR</button>
-                                            }
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        }
+                    <div className="table-responsive">
+                        <table className="table table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">NOMBRES</th>
+                                <th scope="col">APELLIDOS</th>
+                                <th scope="col">CORREO</th>
+                                <th scope="col">TIPO</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {
+                                this.state.listapersonal.map((obj, idx) => {
+                                    return (
+                                        <tr key={idx}>
+                                            <th scope="row">{obj.idadministrador}</th>
+                                            <td>{obj.nombres}</td>
+                                            <td>{obj.apellidos}</td>
+                                            <td>{obj.correo}</td>
+                                            <td>{obj.role? "Administrador":"Repartidor"}</td>
+                                            <td align="center">
+                                                {
+                                                    obj.habilitado? <button className="btn btn-danger" onClick={this.fetchCambiarEstado.bind(this, obj.idadministrador,!obj.habilitado)}>DESHABILITAR</button>:<button className="btn btn-success" onClick={this.fetchCambiarEstado.bind(this, obj.idadministrador,!obj.habilitado)}>HABILITAR</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            }
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         );

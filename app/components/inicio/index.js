@@ -5,6 +5,8 @@ import VerProductos from "./verproductos";
 import RegistrarRepartidor from "./registrarrepartidor";
 import VerRepartidores from "./verrepartidores";
 import VerPedidos from "./verpedidos";
+import Categorias from "./categorias";
+
 import Cookie from 'js-cookie';
 
 import VerPedidosRepartidor from "../repartidor/verpedidosrepartidor";
@@ -59,6 +61,10 @@ class Index extends Component {
                 {
                     // SECCIÓN PARA EL REPARTIDOR
                     this.state.opcionElegida === "101" && <VerPedidosRepartidor/>
+                }
+
+                {
+                    this.state.opcionElegida === "6" && <Categorias/>
                 }
             </Layout>
         );
