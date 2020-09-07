@@ -63,8 +63,12 @@ class VerRepartidores extends Component {
                     )
                         .then(res => res.json())
                         .then(data => {
-                            swal("ESTADO ACTUALIZADO", "Se le actualizo el estado al usuario", "success");
-                            console.log("RPTA:", data);
+                            if (data.status === 'ok'){
+                                swal("ESTADO ACTUALIZADO", "Se le actualizo el estado al usuario", "success");
+                                this.fetchListaPersonal();
+                            }else{
+                                swal("¡¡ UPS !!", "No se pudo actualizar el estado del usuario", "error");
+                            }
                         });
                 }
             });
