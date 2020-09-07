@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import swal from 'sweetalert';
 
 class VerProductos extends Component {
     constructor(props) {
@@ -18,17 +19,30 @@ class VerProductos extends Component {
 
             editando: false,
             ideditar: '',
+
+            nombreitem: '',
+            descripcionitem: '',
+            stockitem: '',
+            precioitem: '',
+            categoria: '',
+            imagenitem: '',
+            enoferta: false,
+
+            datositemeditando: {},
         };
 
-        this.fetchListaProdutos = this.fetchListaProdutos.bind(this);
+        this.fetchListaProductos = this.fetchListaProductos.bind(this);
         this.fetchObtenerCategorias = this.fetchObtenerCategorias.bind(this);
+        this.fetchObtenerDatosProducto = this.fetchObtenerDatosProducto.bind(this);
+        this.fetchActualizarDatosProductos = this.fetchActualizarDatosProductos.bind(this);
+
         this.inputChangeComponent = this.inputChangeComponent.bind(this);
         this.buscandoProducto = this.buscandoProducto.bind(this);
         this.editandoProducto = this.editandoProducto.bind(this);
         this.cancelarEditado = this.cancelarEditado.bind(this);
     }
 
-    fetchListaProdutos(){
+    fetchListaProductos(){
         console.log("TRAENDO LISTA");
         fetch(
             "/api/items/tabla",{
@@ -50,7 +64,99 @@ class VerProductos extends Component {
             });
     }
 
+    fetchObtenerDatosProducto(){
+        console.log("OBTENIENDO DATOS DE UN PRODUCTO: ", '/api/items/' + this.state.ideditar);
+        fetch(
+            '/api/items/datos/' + this.state.ideditar,{
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': localStorage.getItem('tiendauth')
+                }
+            }
+        )
+            .then(res => res.json())
+            .then(datosItem => {
+                console.log(datosItem);
+                if (datosItem.status === 'ok'){
+                    this.setState({
+                        nombreitem: datosItem.data.nombreitem,
+                        descripcionitem: datosItem.data.descripcionitem,
+                        stockitem: datosItem.data.stockitem,
+                        precioitem: datosItem.data.precioitem,
+                        categoria: datosItem.data.categoria,
+                        antiguaimagenitem: "/images/productos/" + datosItem.data.imagenitem,
+                        enoferta: datosItem.data.enoferta,
+                    })
+                }
+            });
+    }
+
+    fetchActualizarDatosProductos(){
+        swal( "Cambiando Estado", {
+            buttons: {
+                cancel: {
+                    text: "Cancelar",
+                    value: false,
+                    visible: true,
+                    className: "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text: "Continuar",
+                    value: true,
+                    visible: true,
+                    className: "",
+                    closeModal: true
+                }
+            }
+        })
+            .then(rpta => {
+                if (rpta){
+                    let body = new FormData();
+
+                    // SELECCIONADO IMAGEN DEL PRODUCTO PARA SUBIRLO
+                    const imagenItem = document.getElementById('imagenitem');
+                    body.append('imagenItem', imagenItem.files[0]);
+
+                    body.append("iditem", this.state.ideditar);
+                    body.append("nombreitem", this.state.nombreitem);
+                    body.append("stockitem", this.state.stockitem);
+                    body.append("precioitem", this.state.precioitem);
+                    body.append("categoria", this.state.categoria);
+                    body.append("enoferta", this.state.enoferta);
+                    body.append("descripcionitem", this.state.descripcionitem);
+
+
+                    fetch(
+                        "/api/items",{
+                            method: 'put',
+                            body: body,
+                            headers: {
+                                'x-access-token': localStorage.getItem('tiendauth')
+                            }
+                        }
+                    )
+                        .then(res => res.json())
+                        .then(actualizacion => {
+                            if (actualizacion.status === 'ok'){
+                                this.fetchListaProductos()
+                                swal("ACTUALIZADO", "Los datos del producto fueron actualizados con éxito", "success");
+                                this.cancelarEditado();
+                            }else{
+                                swal("¡¡ UPPS !!", "Al parecer tuvimos problemas para actualizar, intentelo nuevamente", "error");
+                            }
+                        });
+                }else{
+                    // EN EL CASO QUE NO HAYA QUERIDO ACTUALIZAR
+                    swal("SIN CAMBIOS", "No se guardo ningun cambio hecho al producto", "warning");
+                }
+            });
+    }
+
     fetchObtenerCategorias(){
+        console.log("Traendo lista de categorias");
         fetch('/api/catalogos/2', {
             method: 'get',
             headers: {
@@ -102,13 +208,22 @@ class VerProductos extends Component {
         this.setState({
             editando: true,
             ideditar: idItem
+        }, () => {
+            this.fetchObtenerDatosProducto();
         });
     }
 
     cancelarEditado(){
         this.setState({
             editando: false,
-            ideditar: ''
+            ideditar: '',
+            nombreitem: '',
+            descripcionitem: '',
+            stockitem: '',
+            precioitem: '',
+            categoria: '',
+            imagenitem: '',
+            enoferta: false,
         })
     }
 
@@ -126,7 +241,7 @@ class VerProductos extends Component {
     }
 
     componentDidMount() {
-        this.fetchListaProdutos();
+        this.fetchListaProductos();
         this.fetchObtenerCategorias();
     }
 
@@ -206,51 +321,73 @@ class VerProductos extends Component {
                 <div className="modal fade" id="listaRepartidores" data-backdrop="static"
                      data-keyboard="false" tabIndex="-1" aria-labelledby="listaRepartidoresLabel"
                      aria-hidden="true">
-                    <div className="modal-dialog">
+                    <div className="modal-dialog modal-lg">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title" id="listaRepartidoresLabel">EDITAR PRODUCTO</h5>
-                                <button type="button" className="close" data-dismiss="modal"
+                                <button type="button" className="close" data-dismiss="modal" onClick={this.cancelarEditado}
                                         aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div className="modal-body text-center">
-                                <div className="form">
-                                    <div className="form-row">
-                                        NOMBRE:
-                                        <input type="text" className="form-control"/>
+                                <div className="row">
+                                    <div className="col-sm-12 col-md-6 text-center" style={{backgroundColor: this.state.imagenitem !== ""? "red":''}}>
+                                        {
+                                            this.state.imagenitem !== ""?
+                                                <h5>Actualizara Imagen</h5>:
+                                                <h5>Imagen Actual</h5>
+                                        }
+                                        <img src={this.state.antiguaimagenitem} alt="Imagen Producto" width="100%"/>
                                     </div>
-                                    <div className="form-row">
-                                        DESCRIPCIÓN:
-                                        <input type="text" className="form-control"/>
-                                    </div>
-                                    <div className="form-row">
-                                        STOCK:
-                                        <input type="text" className="form-control"/>
-                                    </div>
-                                    <div className="form-row">
-                                        PRECIO:
-                                        <input type="text" className="form-control"/>
-                                    </div>
-                                    <div className="form-row">
-                                        CATEGORIA:
-                                        <select id="nuevacategoria" name="nuevacategoria" className="form-control" onChange={this.inputChangeComponent}>
-                                            {
-                                                this.state.listaCategorias.map(ele => {
-                                                    return (
-                                                        <option key={ele.idcatalogo} value={ele.idcatalogo}>{ele.valor}</option>
-                                                    )
-                                                })
-                                            }
-                                        </select>
+                                    <div className="col-sm-12 col-md-6">
+                                        <div className="form">
+                                            <div className="form-row">
+                                                NOMBRE:
+                                                <input type="text" className="form-control" name="nombreitem" value={this.state.nombreitem} onChange={this.inputChangeComponent}/>
+                                            </div>
+                                            <div className="form-row">
+                                                DESCRIPCIÓN:
+                                                <input type="text" className="form-control" name="descripcionitem" value={this.state.descripcionitem} onChange={this.inputChangeComponent}/>
+                                            </div>
+                                            <div className="form-row">
+                                                STOCK:
+                                                <input type="text" className="form-control" name="stockitem" value={this.state.stockitem} onChange={this.inputChangeComponent}/>
+                                            </div>
+                                            <div className="form-row">
+                                                PRECIO:
+                                                <input type="text" className="form-control" name="precioitem" value={this.state.precioitem} onChange={this.inputChangeComponent}/>
+                                            </div>
+                                            <div className="form-row">
+                                                EN OFERA:
+                                                <input type="checkbox" className="form-control" name="enoferta" checked={this.state.enoferta} onChange={this.inputChangeComponent}/>
+                                            </div>
+                                            <div className="form-row">
+                                                CATEGORIA:
+                                                <select id="categoria" name="categoria" className="form-control" onChange={this.inputChangeComponent}>
+                                                    {
+                                                        this.state.listaCategorias.map(ele => {
+                                                            return (
+                                                                <option key={ele.idcatalogo} value={ele.idcatalogo} selected={ele.idcatalogo === this.state.categoria}>{ele.valor}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div className="form-row">
+                                                IMAGEN PRODUCTO:
+                                                <input type="file" className="form-control" name="imagenitem" id="imagenitem" onChange={this.inputChangeComponent}/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cerrar
+                                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.cancelarEditado}>
+                                    Cancelar
                                 </button>
-                                <button type="button" className="btn btn-primary" data-dismiss="modal">Guardar
+                                <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.fetchActualizarDatosProductos}>
+                                    Actualizar
                                 </button>
                             </div>
                         </div>

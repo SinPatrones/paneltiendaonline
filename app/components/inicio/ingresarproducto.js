@@ -28,8 +28,6 @@ class IngresarProducto extends Component {
 
     fetchCrearItem(evt){
         evt.preventDefault();
-        const file_data = document.querySelector('input[type="file"]');
-
         let body = new FormData();
 
         // SELECCIONADO IMAGEN DEL PRODUCTO PARA SUBIRLO
@@ -45,11 +43,6 @@ class IngresarProducto extends Component {
         body.append("enoferta", this.state.enoferta);
         body.append("descripcionitem", this.state.descripcion);
 
-        for(let [name, value] of body) {
-            console.log(`${name} = ${value}`); // key1=value1, then key2=value2
-        }
-
-        console.log("BODY:", body);
         fetch('/api/items', {
             method: 'post',
             body: body,

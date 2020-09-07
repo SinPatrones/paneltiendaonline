@@ -43,8 +43,8 @@ class Sidebar extends Component {
                                 Soporte
                             </a>
                             <a href="#" className="list-group-item list-group-item-action"><img
-                                src="/images/phone.png"/> 959 370 922</a>
-                            <a href="#" className="list-group-item list-group-item-action"><img src="/images/mail.png"/>contacto@dolarsol.com</a>
+                                src="/images/phone.png"/> 949 044 802</a>
+                            <a href="#" className="list-group-item list-group-item-action"><img src="/images/mail.png" style={{display: 'none'}}/>contacto@dolarsol.com</a>
                         </div>
                     </div>
                 </div>

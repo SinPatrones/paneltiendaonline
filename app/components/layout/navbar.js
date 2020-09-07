@@ -1,8 +1,20 @@
 import React, {Component} from 'react';
+import Cookie from "js-cookie";
+import swal from 'sweetalert';
 
 class Navbar extends Component {
     constructor(props) {
         super(props);
+
+        this.cerrarSesion = this.cerrarSesion.bind(this);
+    }
+
+    cerrarSesion(){
+        console.log("Cerrando sesión");
+        localStorage.setItem('tiendauth', "");
+        Cookie.set('tiendaauth', "");
+        swal("SESIÓN CERRADA", "Lo esperamos de nuevamente.", "success");
+        location.href = '/admin/ingresar';
     }
 
     render() {
@@ -38,7 +50,7 @@ class Navbar extends Component {
                                     Configuración
                                 </a>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a className="dropdown-item" href="#">Salir</a>
+                                    <a className="dropdown-item" href="#" onClick={this.cerrarSesion}>Salir</a>
                                 </div>
                             </li>
                         </ul>
@@ -56,7 +68,7 @@ class Navbar extends Component {
                                     Configuración
                                 </a>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a className="dropdown-item" href="#">Salir</a>
+                                    <a className="dropdown-item" href="#" onClick={this.cerrarSesion}>Salir</a>
                                 </div>
                             </li>
                         </ul>
@@ -64,7 +76,7 @@ class Navbar extends Component {
 
                 </div>
 
-                <button type="button" className="btn btn-warning">Salir</button>
+                <button type="button" className="btn btn-warning" onClick={this.cerrarSesion}>Salir</button>
 
             </nav>
         );
