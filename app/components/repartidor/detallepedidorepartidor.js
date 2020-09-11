@@ -243,6 +243,8 @@ class DetallePedidoRepartidor extends Component {
                         <h3 className="text-center">DATOS</h3>
                         <strong>MONTO TOTAL:</strong> S/ { parseFloat(this.state.cabecera.montototal).toFixed(2)}
                         <br/>
+                        <strong>MONTO DELIVERY:</strong> {this.state.cabecera.montodelivery? "S/ " + parseFloat(this.state.cabecera.montodelivery).toFixed(2): "NO ASIGNADO"}
+                        <br/>
                         <strong>CALIFICACIÓN:</strong> { this.state.cabecera.calificacion? this.state.cabecera.calificacion + " estrellas": "Sin Calificar" }
                         <br/>
                         <strong>COMENTARIOS:</strong> { this.state.cabecera.comentarios? this.state.cabecera.comentarios: "Sin Comentarios" }
@@ -312,6 +314,10 @@ class DetallePedidoRepartidor extends Component {
                                     <h3>MONTO RECHAZADO: S/ {parseFloat(this.state.preciorechazado).toFixed(2)}</h3>
                                     <br/>
                                     <h3>MONTO A PAGAR: S/ {parseFloat(this.state.precioaceptado).toFixed(2)}</h3>
+                                    <br/>
+                                    <h3>MONTO DELIVERY: {this.state.cabecera.montodelivery? "S/ " + parseFloat(this.state.cabecera.montodelivery).toFixed(2): "NO ASIGNADO"}</h3>
+                                    <br/>
+                                    <h3>TOTAL: {this.state.cabecera.montodelivery? "S/ " + (parseFloat(this.state.cabecera.montodelivery) + parseFloat(this.state.precioaceptado)).toFixed(2): this.state.precioaceptado.toFixed(2) + " SIN MONTO DE ENVIO"}</h3>
                                 </React.Fragment>
                         }
                         {
@@ -319,7 +325,7 @@ class DetallePedidoRepartidor extends Component {
                             <React.Fragment>
                                 <h3>MONTO RECHAZADO FUE: S/ {parseFloat(this.state.cabecera.montorechazado).toFixed(2)}</h3>
                                 <br/>
-                                <h3>MONTO PAGADO FUE: S/ {parseFloat(this.state.cabecera.montopagado).toFixed(2)}</h3>
+                                <h3>MONTO PAGADO FUE: S/ {(parseFloat(this.state.cabecera.montopagado) + parseFloat(this.state.cabecera.montodelivery)).toFixed(2)}</h3>
                             </React.Fragment>
                         }
 

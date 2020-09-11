@@ -123,7 +123,7 @@ class VerPedidosRepartidor extends Component {
                                                 <tr key={obj.idpedido}>
                                                     <th scope="row" className="text-center" style={{backgroundColor: obj.estadopedido === '3'? "#ef5350": obj.estadopedido === '2'? "#93e9be": "#ace7ff"}}><strong>{ obj.idpedido }</strong></th>
                                                     <td>{ "Fecha: " + formatoFecha(obj.tsfechapedido)  } <br/> { "Hora: " + formatoHora(obj.tsfechapedido) }</td>
-                                                    <td>{ parseFloat(obj.montototal).toFixed(2) }</td>
+                                                    <td>S/ { parseFloat(obj.montototal).toFixed(2) } <strong>( {obj.montodelivery? "Precio Envio S/ " + obj.montodelivery.toFixed(2): "SIN MONTO"} )</strong></td>
                                                     <td>{ obj.nombres + " " + obj.apellidos }</td>
                                                     <td>{ obj.telefono }</td>
                                                     <td>{ obj.direccion }</td>
