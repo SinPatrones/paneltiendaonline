@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import DetallePedido from "./detallepedido";
 import swal from 'sweetalert';
+import RegistrarRepartidor from "./registrarrepartidor";
 
 class VerPedidos extends Component {
     constructor(props) {
@@ -16,11 +17,14 @@ class VerPedidos extends Component {
 
             nombresclientebuscar: '',
             idpedidobuscar: '',
+
+            montodelivery: '',
         };
 
         this.fetchObtenerPedidos = this.fetchObtenerPedidos.bind(this);
         this.fetchAsignarRepartidor = this.fetchAsignarRepartidor.bind(this);
         this.fetchObtenerRepartidores = this.fetchObtenerRepartidores.bind(this);
+        this.fetchAsignarMontoDelivery = this.fetchAsignarMontoDelivery.bind(this);
 
         this.verPedido = this.verPedido.bind(this);
         this.menuPrincipal = this.menuPrincipal.bind(this);
@@ -99,6 +103,32 @@ class VerPedidos extends Component {
             });
     }
 
+    fetchAsignarMontoDelivery(){
+        fetch(
+            '/api/pedido/asignarmontodelivery',{
+                method: 'put',
+                body: JSON.stringify({
+                    idpedido: this.state.idpedido,
+                    montodelivery: this.state.montodelivery
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': localStorage.getItem('tiendauth')
+                }
+            }
+        )
+            .then(res => res.json())
+            .then(montoasignado => {
+                if (montoasignado.status === "ok"){
+                    swal("OPERACIÓN ÉXITOS", "Monto asignado con éxito", "success").then(r => console.log("RPTA:", r));
+                    this.fetchObtenerPedidos();
+                }else{
+                    swal(montoasignado.idstatus === 202?"NO AUTORIZADO":"ERROR", montoasignado.msg, "error").then(r => console.log("RPTA:", r));
+                }
+            });
+    }
+
     verPorFiltro(evt){
         this.setState({
             filtro: evt.target.name.split(":")[0]
@@ -122,8 +152,9 @@ class VerPedidos extends Component {
         const idpedido = evt.target.name.split(":")[0];
         this.setState({
             idpedido: null,
-            idrepartidor: 0
-        }, () => {
+            idrepartidor: 0,
+            montodelivery: '',
+        }, () => { // PARA PODER RESETEAR VALORES ANTERIORES
             this.setState({
                 idpedido: idpedido
             });
@@ -189,7 +220,7 @@ class VerPedidos extends Component {
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">FECHA - HORA</th>
-                                            <th scope="col">MONTO PEDIDO</th>
+                                            <th scope="col" className="text-center">MONTO PEDIDO</th>
                                             <th scope="col" className="text-center">CLIENTE</th>
                                             <th scope="col" className="text-center">DIRECCIÓN</th>
                                             <th scope="col" className="text-center">TELEFONO</th>
@@ -205,7 +236,21 @@ class VerPedidos extends Component {
                                                         <th scope="row"
                                                             style={{backgroundColor: obj.estadopedido === '3' ? "#ef5350" : obj.estadopedido === '2' ? "#93e9be" : "#ace7ff"}}>{obj.idpedido}</th>
                                                         <td>{formatoFecha(obj.tsfechapedido) + " - " + formatoHora(obj.tsfechapedido)}</td>
-                                                        <td>{parseFloat(obj.montototal).toFixed(2)}</td>
+                                                        <td className="text-center">
+                                                            {parseFloat(obj.montototal).toFixed(2)} <strong>{(obj.montodelivery? " (Envio S/." + obj.montodelivery + ")": " (No hay precio de envio)")}</strong>
+                                                            {
+                                                                obj.estadopedido === '1' &&
+                                                                    <React.Fragment>
+                                                                        <br/>
+                                                                        <button className="btn btn-success btn-sm" data-toggle="modal"
+                                                                                data-target="#montodelivery" name={obj.idpedido + ":montodelivery"}
+                                                                                onClick={this.cancelarRepartidor}
+                                                                        >
+                                                                            Asignar
+                                                                        </button>
+                                                                    </React.Fragment>
+                                                            }
+                                                        </td>
                                                         <td align="center">{obj.nombrescliente + " " + obj.apellidoscliente}</td>
                                                         <td align="center">{obj.direccioncliente}</td>
                                                         <td align="center">{obj.telefonocliente}</td>
@@ -213,15 +258,20 @@ class VerPedidos extends Component {
                                                             obj.idrepartidor ?
                                                                 <div>
                                                                     {obj.nombres + " " + obj.apellidos}
-                                                                    <br/>
-                                                                    <button hidden={obj.estadopedido !== '1'} type="button"
-                                                                            className="btn btn-warning btn-sm"
-                                                                            data-toggle="modal"
-                                                                            data-target="#listaRepartidores"
-                                                                            name={obj.idpedido + ":asignar"}
-                                                                            onClick={this.cancelarRepartidor}>
-                                                                        Cambiar
-                                                                    </button>
+                                                                    {
+                                                                        obj.estadopedido !== '2' &&
+                                                                            <React.Fragment>
+                                                                                <br/>
+                                                                                <button hidden={obj.estadopedido !== '1'} type="button"
+                                                                                        className="btn btn-warning btn-sm"
+                                                                                        data-toggle="modal"
+                                                                                        data-target="#listaRepartidores"
+                                                                                        name={obj.idpedido + ":asignar"}
+                                                                                        onClick={this.cancelarRepartidor}>
+                                                                                    Cambiar
+                                                                                </button>
+                                                                            </React.Fragment>
+                                                                    }
                                                                 </div> :
                                                                 <div>
                                                                     Sin Asignar <br/>
@@ -295,13 +345,39 @@ class VerPedidos extends Component {
                                             </table>
                                         </div>
                                         <div className="modal-footer">
-                                            <button type="button" className="btn btn-secondary" data-dismiss="modal"
-                                                    oncancel={this.cancelarRepartidor}>Cerrar
+                                            <button className="btn btn-secondary" data-dismiss="modal" data-dismiss="modal"
+                                                    oncancel={this.cancelarRepartidor}>
+                                                Cerrar
                                             </button>
-                                            <button type="button" className="btn btn-primary" data-dismiss="modal"
-                                                    onClick={this.fetchAsignarRepartidor}
-                                                    disabled={this.state.idrepartidor === 0}>Guardar
+                                            <button className="btn btn-primary" onClick={this.fetchAsignarRepartidor} data-dismiss="modal"
+                                                    disabled={this.state.idrepartidor === 0}>
+                                                Guardar
                                             </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="modal fade" id="montodelivery" tabIndex="-1"
+                                 aria-labelledby="montodeliveryLabel" aria-hidden="true">
+                                <div className="modal-dialog">
+                                    <div className="modal-content">
+                                        <div className="modal-header">
+                                            <h5 className="modal-title" id="montodeliveryLabel">MONTO DE ENVIO</h5>
+                                            <button type="button" className="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div className="modal-body">
+                                            <div className="form-group">
+                                                <label htmlFor="montodelivery">Monto Delivery</label>
+                                                <input type="text" className="form-control" name="montodelivery" onChange={this.inputChange} value={this.state.montodelivery}/>
+                                            </div>
+                                        </div>
+                                        <div className="modal-footer">
+                                            <button className="btn btn-warning" data-dismiss="modal" onClick={this.cancelarRepartidor}>Cancelar</button>
+                                            <button className="btn btn-danger" disabled={this.state.montodelivery === ''} onClick={this.fetchAsignarMontoDelivery} data-dismiss="modal">Asignar</button>
                                         </div>
                                     </div>
                                 </div>
