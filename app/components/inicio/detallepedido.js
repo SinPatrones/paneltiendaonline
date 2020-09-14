@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import swal from 'sweetalert';
 
 class DetallePedido extends Component {
     constructor(props) {
@@ -6,9 +7,23 @@ class DetallePedido extends Component {
         this.state = {
             cabecera: {},
             descripcion: [],
+
+            editando: false,
+            iddetallepedido: '',
+            idpedidomaster: '',
+
+            preciounitario: '',
+            cantidaditems: '',
+            preciototalantiguo: '',
         };
 
         this.fetchListaProductos = this.fetchListaProductos.bind(this);
+        this.fetchActualizarPrecio = this.fetchActualizarPrecio.bind(this);
+
+        this.activarEdicion = this.activarEdicion.bind(this);
+        this.cancelarEdicion = this.cancelarEdicion.bind(this);
+
+        this.onInputChange = this.onInputChange.bind(this);
 
     }
 
@@ -24,6 +39,68 @@ class DetallePedido extends Component {
                     descripcion: pedidoDatos.data.descripcion
                 })
             });
+    }
+
+    fetchActualizarPrecio(){
+        fetch(
+            '/api/detallepedido/',{
+                method: 'put',
+                body: JSON.stringify({
+                    idpedidomaster: this.state.idpedidomaster,
+                    iddetallepedido: this.state.iddetallepedido,
+                    cantidaditems: this.state.cantidaditems,
+                    preciounitario: this.state.preciounitario
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': localStorage.getItem('tiendauth')
+                }
+            }
+        )
+            .then(res => res.json())
+            .then(actualizado => {
+                if (actualizado.status === 'ok'){
+                    swal("ACTUALIZACIÓN EXITOSA", "Nuevo monto actualizado", "success").then(r => console.log("RPTA:", r));
+                    this.cancelarEdicion();
+                    this.fetchListaProductos();
+                    this.props.actualizarPedidos();
+                }else{
+                    swal("ERROR EN ACTUALIZAR", actualizado.msg, "error").then(r => console.log("RPTA:", r));
+                }
+            });
+    }
+
+    activarEdicion(evt){
+        const PARTES = evt.target.name.split(":");
+        this.setState({
+            editando: true,
+            iddetallepedido: parseInt(PARTES[0]),
+            idpedidomaster: parseInt(PARTES[3]),
+            preciounitario: parseFloat(document.getElementById(PARTES[0] + ":preciounitario").innerText),
+            cantidaditems: parseFloat(PARTES[2]),
+            preciototalantiguo: parseFloat(document.getElementById(PARTES[0] + ":preciounitario").innerText) * parseFloat(PARTES[2])
+        });
+    }
+
+    cancelarEdicion(){
+        document.getElementById(this.state.iddetallepedido + ":preciototal").innerText = this.state.preciototalantiguo;
+        this.setState({
+            editando: false,
+            iddetallepedido: '',
+            preciounitario: '',
+            cantidaditems: '',
+            preciototalantiguo: '',
+            idpedidomaster: '',
+        });
+    }
+
+    onInputChange(evt){
+        this.setState({
+            [evt.target.name]: evt.target.value
+        }, () => {
+            document.getElementById(this.state.iddetallepedido + ":preciototal").innerText = (this.state.preciounitario * this.state.cantidaditems).toFixed(2);
+        });
     }
 
     componentDidMount() {
@@ -61,12 +138,33 @@ class DetallePedido extends Component {
                             {
                                 this.state.descripcion.map((obj, idx) => {
                                     return (
-                                        <tr key={idx}>
+                                        <tr key={obj.iddetallepedido}>
                                             <th scope="row">{ idx + 1 }</th>
                                             <td>{ obj.nombreitem }</td>
-                                            <td>{ obj.cantidaditem }</td>
-                                            <td>{ parseFloat(obj.preciounitario).toFixed(2) }</td>
-                                            <td>{ parseFloat(obj.preciototal).toFixed(2) }</td>
+                                            <td className="text-center">
+                                                {
+                                                    (this.state.cabecera.estadopedido !== "1")?obj.cantidaditems:''
+                                                }
+                                                {
+                                                    (this.state.cabecera.estadopedido === "1" && !this.state.editando)  &&
+                                                        <React.Fragment>
+                                                            { obj.cantidaditems }
+                                                            <br/>
+                                                            <button className="btn btn-success btn-sm" name={obj.iddetallepedido + ":editar:" + obj.cantidaditems + ":" + obj.idpedidomaster} onClick={this.activarEdicion}>CAMBIAR</button>
+                                                        </React.Fragment>
+                                                }
+                                                {
+                                                    (this.state.editando && obj.iddetallepedido === this.state.iddetallepedido) &&
+                                                        <React.Fragment>
+                                                            <input type="text" className="form-control" name="cantidaditems" value={this.state.cantidaditems} onChange={this.onInputChange}/>
+                                                            <br/>
+                                                            <button className="btn btn-warning btn-sm" onClick={this.cancelarEdicion}>CANCELAR</button>
+                                                            <button className="btn btn-success btn-sm ml-2" onClick={this.fetchActualizarPrecio}>GUARDAR</button>
+                                                        </React.Fragment>
+                                                }
+                                            </td>
+                                            <td id={obj.iddetallepedido + ":preciounitario"}>{ parseFloat(obj.preciounitario).toFixed(2) }</td>
+                                            <td id={obj.iddetallepedido + ":preciototal"}>{ parseFloat(obj.preciototal).toFixed(2) }</td>
                                             {
                                                 !obj.entregado  && (this.state.cabecera.estadopedido === "3" || this.state.cabecera.estadopedido === "2")?
                                                     <td className="bg-danger">RECHAZADO</td>:

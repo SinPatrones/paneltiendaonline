@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import DetallePedido from "./detallepedido";
 import swal from 'sweetalert';
-import RegistrarRepartidor from "./registrarrepartidor";
 
 class VerPedidos extends Component {
     constructor(props) {
@@ -30,6 +29,7 @@ class VerPedidos extends Component {
         this.menuPrincipal = this.menuPrincipal.bind(this);
         this.seleccionarRepartidor = this.seleccionarRepartidor.bind(this);
         this.cancelarRepartidor = this.cancelarRepartidor.bind(this);
+        this.actualizarPedidos = this.actualizarPedidos.bind(this);
 
         this.verPorFiltro = this.verPorFiltro.bind(this);
         this.inputChange = this.inputChange.bind(this);
@@ -178,6 +178,10 @@ class VerPedidos extends Component {
         this.setState({
             [evt.target.name]: evt.target.value
         });
+    }
+
+    actualizarPedidos(){
+        this.fetchObtenerPedidos();
     }
 
     componentDidMount() {
@@ -391,6 +395,7 @@ class VerPedidos extends Component {
                         <DetallePedido
                             idpedido={this.state.idpedido}
                             menuPrincipal={this.menuPrincipal}
+                            actualizarPedidos={this.actualizarPedidos}
                         />
                 }
             </React.Fragment>
