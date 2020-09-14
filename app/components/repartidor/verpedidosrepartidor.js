@@ -102,7 +102,7 @@ class VerPedidosRepartidor extends Component {
                         <h3 className="text-center">VER MIS PEDIDOS POR ENTREGAR</h3>
                         <button className="btn btn-warning float-right fa fa-eye ml-5" onClick={this.fetchObtenerTodosPedidos} hidden={this.state.todo === 'si'}> TODO</button>
                         <button className="btn btn-warning float-right fa fa-eye ml-5" onClick={this.fetchObtenerPedidos} hidden={this.state.todo === 'no'}> POR ENTREGAR</button>
-                        <div className="col-12">
+                        <div className="col-12 mt-3">
                             <div className="table-responsive">
                                 <table className="table table-hover">
                                     <thead>
@@ -193,6 +193,7 @@ class VerPedidosRepartidor extends Component {
                         <DetallePedidoRepartidor
                             idpedido={this.state.idpedido}
                             menuPrincipal={this.menuPrincipal}
+                            fetchObtenerPedidos={this.fetchObtenerPedidos}
                         />
                 }
             </React.Fragment>

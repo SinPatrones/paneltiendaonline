@@ -5,7 +5,7 @@ class DetallePedidoRepartidor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            cabecera: {montototal: 0, montorechazado: 0, montopagado: 0},
+            cabecera: {montototal: 0, montorechazado: 0, montopagado: 0, tipodepago: ''},
             descripcion: [],
 
             precioaceptado: 0,
@@ -13,12 +13,15 @@ class DetallePedidoRepartidor extends Component {
 
             productosaceptados: [],
             productosrechazados: [],
+
+            tipodepago: '',
         };
 
         this.fetchAnularPedido = this.fetchAnularPedido.bind(this);
         this.fetchAceptarPedido = this.fetchAceptarPedido.bind(this);
         this.fetchListaProductos = this.fetchListaProductos.bind(this);
 
+        this.onChangeInput = this.onChangeInput.bind(this);
         this.sumarAceptado = this.sumarAceptado.bind(this);
         this.sumarRechazado = this.sumarRechazado.bind(this);
         this.aceptarTodo = this.aceptarTodo.bind(this);
@@ -34,7 +37,8 @@ class DetallePedidoRepartidor extends Component {
                 console.log(pedidoDatos);
                 this.setState({
                     cabecera: pedidoDatos.data.cabecera,
-                    descripcion: pedidoDatos.data.descripcion
+                    descripcion: pedidoDatos.data.descripcion,
+                    tipodepago: pedidoDatos.data.cabecera.tipodepago
                 })
             });
     }
@@ -110,7 +114,8 @@ class DetallePedidoRepartidor extends Component {
                                 aceptados: this.state.productosaceptados,
                                 rechazados: this.state.productosrechazados,
                                 precioaceptado: this.state.precioaceptado,
-                                preciorechazado: this.state.preciorechazado
+                                preciorechazado: this.state.preciorechazado,
+                                tipodepago: this.state.tipodepago
                             }),
                             headers: {
                                 'Accept': 'application/json',
@@ -123,12 +128,20 @@ class DetallePedidoRepartidor extends Component {
                         .then(data => {
                             if(data.status === 'ok'){
                                 swal("REGISTRADO", "Se actualizo pedido, entregado", "success").then(r => console.log("RPTA:", r));
+                                this.fetchListaProductos();
+                                this.props.fetchObtenerPedidos();
                             }else{
                                 swal("ERROR", "No se pudo actualizar pedido, vuelva a intentarlo por favor", "error").then(r => console.log("RPTA:", r));
                             }
                         });
                 }
             });
+    }
+
+    onChangeInput(evt){
+        this.setState({
+            [evt.target.name]: evt.target.value
+        })
     }
 
     aceptarTodo(){
@@ -241,6 +254,8 @@ class DetallePedidoRepartidor extends Component {
                         <strong>TELEFONO: </strong> {this.state.cabecera.telefono}
                         <br/>
                         <h3 className="text-center">DATOS</h3>
+                        <strong>TIPO DE PAGO:</strong> {this.state.tipodepago.toUpperCase()}
+                        <br/>
                         <strong>MONTO TOTAL:</strong> S/ { parseFloat(this.state.cabecera.montototal).toFixed(2)}
                         <br/>
                         <strong>MONTO DELIVERY:</strong> {this.state.cabecera.montodelivery? "S/ " + parseFloat(this.state.cabecera.montodelivery).toFixed(2): "NO ASIGNADO"}
@@ -318,6 +333,17 @@ class DetallePedidoRepartidor extends Component {
                                     <h3>MONTO DELIVERY: {this.state.cabecera.montodelivery? "S/ " + parseFloat(this.state.cabecera.montodelivery).toFixed(2): "NO ASIGNADO"}</h3>
                                     <br/>
                                     <h3>TOTAL: {this.state.cabecera.montodelivery? "S/ " + (parseFloat(this.state.cabecera.montodelivery) + parseFloat(this.state.precioaceptado)).toFixed(2): this.state.precioaceptado.toFixed(2) + " SIN MONTO DE ENVIO"}</h3>
+                                    <br/>
+                                    <hr/>
+                                    <h3><label htmlFor="tipodepago" className="text-center">MÉDOTO DE PAGO</label></h3>
+                                    <select name="tipodepago" id="tipodepago" className="form-control" value={this.state.tipodepago} onChange={this.onChangeInput}>
+                                        <option value="contraentrega" selected={this.state.cabecera.tipodepago === "contraentrega"}>CONTRAENTREGA</option>
+                                        <option value="yape" selected={this.state.cabecera.tipodepago === "yape"}>YAPE</option>
+                                        <option value="tunki" selected={this.state.cabecera.tipodepago === "tunki"}>TUNKI</option>
+                                        <option value="lukita" selected={this.state.cabecera.tipodepago === "lukita"}>LUKITA</option>
+                                        <option value="plin" selected={this.state.cabecera.tipodepago === "plin"}>PLIN</option>
+                                        <option value="transferencia" selected={this.state.cabecera.tipodepago === "transferencia"}>TRANSFERENCIA</option>
+                                    </select>
                                 </React.Fragment>
                         }
                         {
@@ -346,6 +372,7 @@ class DetallePedidoRepartidor extends Component {
                         }
                     </div>
                 </div>
+                <br/><br/>
             </React.Fragment>
         );
     }
