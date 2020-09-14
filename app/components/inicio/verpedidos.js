@@ -12,7 +12,9 @@ class VerPedidos extends Component {
             idpedido: null,
             idrepartidor: 0,
 
-            filtro: '0',
+            estadopedido: '0',
+            filtro: 'nombres',
+            valorfiltro: '',
 
             nombresclientebuscar: '',
             idpedidobuscar: '',
@@ -20,10 +22,13 @@ class VerPedidos extends Component {
             montodelivery: '',
         };
 
+        this.fetchFiltroCombo = this.fetchFiltroCombo.bind(this);
+
         this.fetchObtenerPedidos = this.fetchObtenerPedidos.bind(this);
         this.fetchAsignarRepartidor = this.fetchAsignarRepartidor.bind(this);
         this.fetchObtenerRepartidores = this.fetchObtenerRepartidores.bind(this);
         this.fetchAsignarMontoDelivery = this.fetchAsignarMontoDelivery.bind(this);
+        this.fetchLimpiaryObtenerPedidos = this.fetchLimpiaryObtenerPedidos.bind(this);
 
         this.verPedido = this.verPedido.bind(this);
         this.menuPrincipal = this.menuPrincipal.bind(this);
@@ -35,9 +40,33 @@ class VerPedidos extends Component {
         this.inputChange = this.inputChange.bind(this);
     }
 
+    fetchFiltroCombo(){
+        fetch(
+            '/api/pedido/filtrocombo',{
+                method: 'post',
+                body: JSON.stringify({
+                    filtro: this.state.filtro,
+                    valor: this.state.valorfiltro,
+                    estadopedido: this.state.estadopedido
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-access-token': localStorage.getItem('tiendauth')
+                }
+            }
+        )
+            .then(res => res.json())
+            .then(listaPedidos => {
+                this.setState({
+                    listaPedidos: listaPedidos.data
+                });
+            });
+    }
+
     fetchObtenerPedidos(){
         fetch(
-            '/api/pedido/lista/' + this.state.filtro + '?nombres=' + this.state.nombresclientebuscar + '&idpedido=' + this.state.idpedidobuscar,{
+            '/api/pedido/lista/' + this.state.estadopedido + '?nombres=' + this.state.nombresclientebuscar + '&idpedido=' + this.state.idpedidobuscar,{
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -55,9 +84,13 @@ class VerPedidos extends Component {
     }
 
     fetchLimpiaryObtenerPedidos(){
+        console.log("LIMPIANDO FILTROS APLICADOS");
         this.setState({
             nombresclientebuscar: '',
             idpedidobuscar: '',
+            filtro: 'nombres',
+            valorfiltro: '',
+            estadopedido: '0'
         }, () => {
             this.fetchObtenerPedidos();
         });
@@ -131,7 +164,7 @@ class VerPedidos extends Component {
 
     verPorFiltro(evt){
         this.setState({
-            filtro: evt.target.name.split(":")[0]
+            estadopedido: evt.target.name.split(":")[0]
         }, () => {
             this.fetchObtenerPedidos();
         });
@@ -202,16 +235,21 @@ class VerPedidos extends Component {
                         <div className="row justify-content-center">
                             <div className="col-12 col-sm-12 col-md-4">
                                 <div className=" d-flex justify-items-center">
-                                    <button disabled={this.state.filtro === '0'} onClick={this.verPorFiltro} name="0:filtro" className="btn ml-1" style={{backgroundColor: '#356dff'}}>TODO</button>
-                                    <button disabled={this.state.filtro === '1'} onClick={this.verPorFiltro} name="1:filtro" className="btn ml-1" style={{backgroundColor: '#ace7ff'}}>EN ESPERA</button>
-                                    <button disabled={this.state.filtro === '2'} onClick={this.verPorFiltro} name="2:filtro" className="btn ml-1" style={{backgroundColor: '#93e9be'}}>ENTREGADO</button>
-                                    <button disabled={this.state.filtro === '3'} onClick={this.verPorFiltro} name="3:filtro" className="btn ml-1" style={{backgroundColor: '#ef5350'}}>ANULADO</button>
+                                    <button disabled={this.state.estadopedido === '0'} onClick={this.verPorFiltro} name="0:filtro" className="btn ml-1" style={{backgroundColor: '#356dff'}}>TODO</button>
+                                    <button disabled={this.state.estadopedido === '1'} onClick={this.verPorFiltro} name="1:filtro" className="btn ml-1" style={{backgroundColor: '#ace7ff'}}>EN ESPERA</button>
+                                    <button disabled={this.state.estadopedido === '2'} onClick={this.verPorFiltro} name="2:filtro" className="btn ml-1" style={{backgroundColor: '#93e9be'}}>ENTREGADO</button>
+                                    <button disabled={this.state.estadopedido === '3'} onClick={this.verPorFiltro} name="3:filtro" className="btn ml-1" style={{backgroundColor: '#ef5350'}}>ANULADO</button>
                                 </div>
                             </div>
                             <div className="col-12 col-sm-12 col-md-6 text-center">
-                                <input onChange={this.inputChange} name="nombresclientebuscar" value={this.state.nombresclientebuscar} type="text" className="form-control mt-2" placeholder="NOMBRES/APELLIDOS CLIENTE" />
-                                <input onChange={this.inputChange} name="idpedidobuscar" value={this.state.idpedidobuscar} type="number" className="form-control mt-1" placeholder="ID PEDIDO" />
-                                <button className="btn btn-warning mt-2" onClick={this.fetchObtenerPedidos}>APLICAR</button>
+                                <select name="filtro" id="filtro" className="form-control" onChange={this.inputChange}>
+                                    <option value="nombres" selected={this.state.filtro === "nombres"}>Nombres</option>
+                                    <option value="apellidos" selected={this.state.filtro === "apellidos"}>Apellidos</option>
+                                    <option value="direccion" selected={this.state.filtro === "direccion"}>Dirección</option>
+                                    <option value="telefono" selected={this.state.filtro === "telefono"}>Telefono</option>
+                                </select>
+                                <input type="text" name="valorfiltro" value={this.state.valorfiltro} onChange={this.inputChange} className="form-control mt-2" placeholder="INGRESE VALOR DE LA BUSQUEDA"/>
+                                <button className="btn btn-warning mt-2" onClick={this.fetchFiltroCombo}>APLICAR</button>
                                 <button className="btn btn-primary mt-2" onClick={this.fetchLimpiaryObtenerPedidos}>LIMPIAR</button>
                             </div>
                         </div>
