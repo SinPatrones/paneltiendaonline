@@ -57,6 +57,45 @@ class Navbar extends Component {
                     }
 
                     {
+                        this.props.nivelusuario === 2 &&
+                        <ul className="navbar-nav">
+                            <li className="nav-item menutop">
+                                <a className="nav-link" href="#" onClick={this.props.elegirOpcion} name="5:verpedidos">Ver Pedidos</a>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Configuración
+                                </a>
+                                <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a className="dropdown-item" href="#" onClick={this.cerrarSesion}>Salir</a>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+
+                    {
+                        this.props.nivelusuario === 3 &&
+                        <ul className="navbar-nav">
+                            <li className="nav-item menutop">
+                                <a className="nav-link" href="#" onClick={this.props.elegirOpcion} name="1:ingresarproducto">Ingresar Producto</a>
+                            </li>
+                            <li className="nav-item menutop">
+                                <a className="nav-link" href="#" onClick={this.props.elegirOpcion} name="2:verproducto">Ver Productos</a>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Configuración
+                                </a>
+                                <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a className="dropdown-item" href="#" onClick={this.cerrarSesion}>Salir</a>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+
+                    {
                         this.props.nivelusuario === 0 &&
                         <ul className="navbar-nav">
                             <li className="nav-item menutop">

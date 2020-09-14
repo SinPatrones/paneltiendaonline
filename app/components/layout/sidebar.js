@@ -26,6 +26,27 @@ class Sidebar extends Component {
                     }
 
                     {
+                        this.props.nivelusuario === 2 &&
+                        <div className="list-group">
+                            <a href="#" className="list-group-item list-group-item-action active">
+                                Panel
+                            </a>
+                            <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="5:verpedidos">Ver Pedidos</a>
+                        </div>
+                    }
+
+                    {
+                        this.props.nivelusuario === 3 &&
+                        <div className="list-group">
+                            <a href="#" className="list-group-item list-group-item-action active">
+                                Panel
+                            </a>
+                            <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="1:ingresarproducto">Ingresar Producto</a>
+                            <a className="list-group-item list-group-item-action" onClick={this.props.elegirOpcion} name="2:verproducto">Ver Productos</a>
+                        </div>
+                    }
+
+                    {
                         this.props.nivelusuario === 0 &&
                         <div className="list-group">
                             <a href="#" className="list-group-item list-group-item-action active">

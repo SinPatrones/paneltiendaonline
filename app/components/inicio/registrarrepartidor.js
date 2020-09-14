@@ -109,6 +109,8 @@ class RegistrarRepartidor extends Component {
                                 <select className="form-control" name="role" id="role" value={this.state.role} onChange={this.inputChangeComponent}>
                                     <option value="0">Repartidor</option>
                                     <option value="1">Administrador</option>
+                                    <option value="2">Ventas</option>
+                                    <option value="3">Logistica</option>
                                 </select>
                             </div>
                         </div>
