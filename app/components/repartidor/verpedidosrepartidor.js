@@ -113,6 +113,7 @@ class VerPedidosRepartidor extends Component {
                                         <th scope="col">CLIENTE</th>
                                         <th scope="col">TELEFONO</th>
                                         <th scope="col">DIRECCIÓN</th>
+                                        <th scope="col">MET. PAGO</th>
                                         <th></th>
                                     </tr>
                                     </thead>
@@ -127,6 +128,7 @@ class VerPedidosRepartidor extends Component {
                                                     <td>{ obj.nombres + " " + obj.apellidos }</td>
                                                     <td>{ obj.telefono }</td>
                                                     <td>{ obj.direccion }</td>
+                                                    <td>{ obj.tipodepago.toUpperCase() }</td>
                                                     <td>
                                                         <button className="btn btn-success" name={obj.idpedido + ":pedido"} onClick={this.verPedido}>VER</button>
                                                     </td>

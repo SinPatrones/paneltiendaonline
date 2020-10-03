@@ -414,3 +414,7 @@ header{
 #progressbar li.active:after {
 	background: #3beb28
 }
+
+.btn.btn-success:disabled{
+	background-color: black;
+}

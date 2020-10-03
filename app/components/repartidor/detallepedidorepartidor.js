@@ -291,7 +291,7 @@ class DetallePedidoRepartidor extends Component {
                                             <tr key={idx}>
                                                 <th scope="row">{ idx + 1 }</th>
                                                 <td>{ obj.nombreitem }</td>
-                                                <td>{ obj.cantidaditem }</td>
+                                                <td>{ obj.cantidaditems }</td>
                                                 <td>{ parseFloat(obj.preciounitario).toFixed(2) }</td>
                                                 <td>{ parseFloat(obj.preciototal).toFixed(2) }</td>
                                                 {
@@ -332,7 +332,7 @@ class DetallePedidoRepartidor extends Component {
                                     <br/>
                                     <h3>MONTO DELIVERY: {this.state.cabecera.montodelivery? "S/ " + parseFloat(this.state.cabecera.montodelivery).toFixed(2): "NO ASIGNADO"}</h3>
                                     <br/>
-                                    <h3>TOTAL: {this.state.cabecera.montodelivery? "S/ " + (parseFloat(this.state.cabecera.montodelivery) + parseFloat(this.state.precioaceptado)).toFixed(2): this.state.precioaceptado.toFixed(2) + " SIN MONTO DE ENVIO"}</h3>
+                                    <h3>TOTAL: {this.state.cabecera.montodelivery? "S/ " + (parseFloat(this.state.cabecera.montodelivery) + parseFloat(this.state.precioaceptado)).toFixed(2): "S/ " + parseFloat(this.state.precioaceptado).toFixed(2) + " (SIN MONTO DE ENVIO)"}</h3>
                                     <br/>
                                     <hr/>
                                     <h3><label htmlFor="tipodepago" className="text-center">MÉDOTO DE PAGO</label></h3>

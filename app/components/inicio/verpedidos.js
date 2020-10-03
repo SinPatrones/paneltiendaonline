@@ -266,6 +266,7 @@ class VerPedidos extends Component {
                                             <th scope="col" className="text-center">CLIENTE</th>
                                             <th scope="col" className="text-center">DIRECCIÓN</th>
                                             <th scope="col" className="text-center">TELEFONO</th>
+                                            <th scope="col" className="text-center">MET. PAGO</th>
                                             <th scope="col">REPARTIDOR</th>
                                             <th></th>
                                         </tr>
@@ -296,6 +297,7 @@ class VerPedidos extends Component {
                                                         <td align="center">{obj.nombrescliente + " " + obj.apellidoscliente}</td>
                                                         <td align="center">{obj.direccioncliente}</td>
                                                         <td align="center">{obj.telefonocliente}</td>
+                                                        <td align="center">{obj.tipodepago.toUpperCase()}</td>
                                                         <td>{
                                                             obj.idrepartidor ?
                                                                 <div>

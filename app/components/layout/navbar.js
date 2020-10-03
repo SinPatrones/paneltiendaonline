@@ -13,8 +13,15 @@ class Navbar extends Component {
         console.log("Cerrando sesión");
         localStorage.setItem('tiendauth', "");
         Cookie.set('tiendaauth', "");
-        swal("SESIÓN CERRADA", "Lo esperamos de nuevamente.", "success");
-        location.href = '/admin/ingresar';
+        swal("SESIÓN CERRADA", "Lo esperamos de nuevamente.", "success")
+            .then(rpta => {
+                if (rpta){
+                    location.href = '/admin/ingresar';
+                }
+            });
+        setTimeout(() => {
+            location.href = '/admin/ingresar';
+        }, 4000);
     }
 
     render() {
